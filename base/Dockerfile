@@ -10,6 +10,5 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 		make \
 		libpcre3-dev \
 		zlib1g-dev \
-		libldap2-dev \
 		libssl-dev \
 		wget
