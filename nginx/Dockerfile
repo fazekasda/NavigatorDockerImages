@@ -22,11 +22,7 @@ RUN mkdir /var/log/nginx \
 	&& rm -rf nginx \
 
 EXPOSE 80 443
-VOLUME [
-	"/etc/nginx/sites-enabled",
-	"/var/log/nginx",
-	"/var/www",
-	]
+VOLUME ["/etc/nginx/sites-enabled", "/var/log/nginx", "/var/www"]
 
 WORKDIR /etc/nginx
 ENTRYPOINT ["nginx"]
