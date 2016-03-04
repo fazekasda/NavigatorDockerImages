@@ -20,8 +20,13 @@ RUN mkdir /var/log/nginx \
 	&& make install \
 	&& cd .. \
 	&& rm -rf nginx \
+	&& rm /etc/nginx/nginx.conf \
+	&& adduser --system --no-create-home --disabled-login --disabled-password --group nginx
 
-EXPOSE 80 443
+COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY ./0000-ddefault.conf /etc/nginx/sites-enabled/0000-ddefault.conf
+COPY ./index.html /var/www/index.html
+EXPOSE 80
 VOLUME ["/etc/nginx/sites-enabled", "/var/log/nginx", "/var/www"]
 
 WORKDIR /etc/nginx
