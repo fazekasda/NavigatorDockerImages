@@ -12,3 +12,5 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 		zlib1g-dev \
 		libssl-dev \
 		wget
+
+CMD ["/bin/bash"]
