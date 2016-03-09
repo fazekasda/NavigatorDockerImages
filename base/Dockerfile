@@ -12,7 +12,11 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 		zlib1g-dev \
 		libssl-dev \
     sudo \
-    wget
+    wget \
+    screen \
+    python \
+    python-setuptools \
+    curl
 
 # install dumb-init
 RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64
