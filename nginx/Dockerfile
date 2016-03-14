@@ -3,31 +3,43 @@ MAINTAINER David Fazekas <fazekasda@gmail.com>
 
 ENV NGINX_VERSION release-1.9.12
 
-RUN mkdir /var/log/nginx \
-	&& mkdir /etc/nginx \
+RUN mkdir -p /CONFIG/nginx \
+	&& mkdir -p /LOG/nginx \
+	&& mkdir -p /DATA/nginx \
+	&& mkdir -p /DATA/nginx/0000-default \
 	&& cd ~ \
 	&& git clone https://github.com/nginx/nginx.git \
 	&& cd ~/nginx \
-	&& git checkout tags/${NGINX_VERSION} \
+	&& git checkout tags/release-1.9.12 \
 	&& ./auto/configure \
 		--with-http_ssl_module \
 		--with-debug \
-		--conf-path=/etc/nginx/nginx.conf \
+		--conf-path=/CONFIG/nginx/nginx.conf \
 		--sbin-path=/usr/sbin/nginx \
-		--pid-path=/var/log/nginx/nginx.pid \
-		--error-log-path=/var/log/nginx/error.log \
-		--http-log-path=/var/log/nginx/access.log \
+		--pid-path=/LOG/nginx/nginx.pid \
+		--error-log-path=/LOG/nginx/error.log \
+		--http-log-path=/LOG/nginx/access.log \
 	&& make install \
 	&& cd .. \
 	&& rm -rf nginx \
-	&& rm /etc/nginx/nginx.conf \
+	&& rm /CONFIG/nginx/nginx.conf \
 	&& adduser --system --no-create-home --disabled-login --disabled-password --group nginx
 
-COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./0000-ddefault.conf /etc/nginx/sites-enabled/0000-ddefault.conf
-COPY ./index.html /var/www/index.html
-EXPOSE 80
-VOLUME ["/etc/nginx/sites-enabled", "/var/log/nginx", "/var/www"]
+COPY nginx.conf /CONFIG/nginx/nginx.conf
+COPY 0000-default.conf /CONFIG/nginx/sites-enabled/0000-default.conf
+COPY index.html /DATA/nginx/0000-default/index.html
+COPY init.sh /sbin/init.sh
+RUN chmod +x /sbin/init.sh
 
-WORKDIR /etc/nginx
-CMD ["nginx"]
+RUN mkdir -p /root/default/config \
+	&& mkdir -p /root/default/data \
+	&& cp -a /CONFIG/nginx/* /root/default/config \
+	&& cp -a /DATA/nginx/* /root/default/data \
+	&& chown -R nginx:nginx /CONFIG/nginx \
+	&& chown -R nginx:nginx /LOG/nginx \
+	&& chown -R nginx:nginx /DATA/nginx
+
+EXPOSE 80
+VOLUME  ["/CONFIG", "/LOG", "/DATA"]
+ENTRYPOINT ["dumb-init", "/sbin/init.sh"]
+CMD ["run_nginx"]
